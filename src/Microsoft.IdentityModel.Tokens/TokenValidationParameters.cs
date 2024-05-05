@@ -110,9 +110,9 @@ namespace Microsoft.IdentityModel.Tokens
     /// <param name="validationParameters"><see cref="TokenValidationParameters"/> required for validation.</param>
     /// <returns>The issuer to use when creating the "Claim"(s) in a "ClaimsIdentity".</returns>
     /// <remarks>The delegate should return a non null string that represents the 'issuer'. If null a default value will be used.
-    /// <see cref="IssuerValidatorAsync"/> if set, will be called before <see cref="IssuerSigningKeyValidatorUsingConfiguration"/> or <see cref="IssuerSigningKeyValidator"/>
+    /// <see cref="IssuerValidatorInternalAsync"/> if set, will be called before <see cref="IssuerSigningKeyValidatorUsingConfiguration"/> or <see cref="IssuerSigningKeyValidator"/>
     /// </remarks>
-    internal delegate ValueTask<string> IssuerValidatorAsync(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters);
+    internal delegate ValueTask<string> IssuerValidatorInternalAsync(string issuer, SecurityToken securityToken, TokenValidationParameters validationParameters);
 
     /// <summary>
     /// Definition for LifetimeValidator.
@@ -302,6 +302,18 @@ namespace Microsoft.IdentityModel.Tokens
         /// Gets or sets <see cref="TokenValidationParameters"/>.
         /// </summary>
         public TokenValidationParameters ActorValidationParameters { get; set; }
+
+        #region Async Validators
+        /// <summary>
+        /// Gets or sets a delegate that will be used to validate the issuer of the token.
+        /// </summary>
+        public IssuerValidatorAsync IssuerValidatorAsync { get; set; }
+        #endregion
+
+        /// <summary>
+        /// Gets or sets a delegate that will be used to validate the issuer of the token.
+        /// </summary>
+        internal IssuerValidatorInternalAsync IssuerValidatorInternalAsync { get; set; }
 
         /// <summary>
         /// Gets or sets a delegate used to validate the cryptographic algorithm used.
@@ -538,18 +550,6 @@ namespace Microsoft.IdentityModel.Tokens
         /// priority. 
         /// </remarks>
         public IssuerValidator IssuerValidator { get; set; }
-
-
-        /// <summary>
-        /// Gets or sets a delegate that will be used to validate the issuer of the token.
-        /// </summary>
-        /// <remarks>
-        /// If set, this delegate will be called to validate the 'issuer' of the token, instead of default processing.
-        /// This means that no default 'issuer' validation will occur.
-        /// Even if <see cref="ValidateIssuer"/> is false, this delegate will still be called.
-        /// IssuerValidatorAsync takes precedence over <see cref="IssuerValidatorUsingConfiguration"/> and <see cref="IssuerValidator"/>.
-        /// </remarks>
-        internal IssuerValidatorAsync IssuerValidatorAsync { get; set; }
 
         /// <summary>
         /// Gets or sets a delegate that will be used to validate the issuer of the token.
